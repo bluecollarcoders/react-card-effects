@@ -7,7 +7,7 @@ const API_Base_URL = "http://deckofcardsapi.com/api/deck";
 
 // Deck: uses deck API, allows drawing card at a time
 
-function Desk() {
+function Deck() {
     const [deck, setDeck] = useState(null);
     const [drawn, setDrawn] = useState([]);
     const [autoDraw, setAutoDraw] = useState(false);

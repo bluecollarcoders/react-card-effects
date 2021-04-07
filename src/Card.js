@@ -3,7 +3,7 @@ import './Card.css';
 
 // Single card: just renders the card as received from deck
 
-function card({name, image}) {
+function Card({name, image}) {
 
     const [{angle, xPos, yPos }] = useState({
         angle: Math.random() * 90 - 45,
