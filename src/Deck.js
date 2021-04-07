@@ -3,85 +3,84 @@ import Card from "./Card";
 import axios from "axios";
 import "./Deck.css";
 
-const API_Base_URL = "http://deckofcardsapi.com/api/deck";
+const API_BASE_URL = "http://deckofcardsapi.com/api/deck";
 
-// Deck: uses deck API, allows drawing card at a time
+/* Deck: uses deck API, allows drawing card at a time. */
 
 function Deck() {
-    const [deck, setDeck] = useState(null);
-    const [drawn, setDrawn] = useState([]);
-    const [autoDraw, setAutoDraw] = useState(false);
-    const timerRef = useRef(null);
+  const [deck, setDeck] = useState(null);
+  const [drawn, setDrawn] = useState([]);
+  const [autoDraw, setAutoDraw] = useState(false);
+  const timerRef = useRef(null);
 
-    // At mount: Load deck from API into state.
-    useEffect(() => {
-        async function getData() {
-            let d = await axios.get(`${API_Base_URL}/new/shuff`);
-            setDeck(d.data);
-        }
-        getData();
-    }, [setDeck]);
+  /* At mount: load deck from API into state. */
+  useEffect(() => {
+    async function getData() {
+      let d = await axios.get(`${API_BASE_URL}/new/shuffle/`);
+      setDeck(d.data);
+    }
+    getData();
+  }, [setDeck]);
 
-    // Draw one card every second if autoDraw is true
-    useEffect(() =>{
-        // Draw a card via API, add card to state "drawn" list
-        async function getCard() {
-            let { deck_id } = deck;
+  /* Draw one card every second if autoDraw is true */
+  useEffect(() => {
+    /* Draw a card via API, add card to state "drawn" list */
+    async function getCard() {
+      let { deck_id } = deck;
 
-            try{
-                let drawRes = await axios.get(`${API_Base_URL}/${deck_id}/draw/`);
+      try {
+        let drawRes = await axios.get(`${API_BASE_URL}/${deck_id}/draw/`);
 
-                if (drawRes.data.remaining === 0) {
-                    setAutoDraw(false);
-                    throw new Error("no cards remaining!");
-                }
-
-                const card = drawRes.data.cards[0];
-
-                setDrawn(d => [
-                    ...d,
-                    {
-                        id: card.code,
-                        name: card.suit + " " + card.value,
-                        image: card.image
-                    }
-                ]);
-            } catch (err) {
-                alert(err);
-            }
-
+        if (drawRes.data.remaining === 0) {
+          setAutoDraw(false);
+          throw new Error("no cards remaining!");
         }
 
-        if (autoDraw && !timerRef.current) {
-            timerRef.current = setInterval(async () => {
-                await getCard();
-            }, 1000);
-        }
+        const card = drawRes.data.cards[0];
 
-        return () => {
-            clearInterval(timerRef.current);
-            timerRef.current = null;
-        };
-    }, [autoDraw, setAutoDraw, deck]);
+        setDrawn(d => [
+          ...d,
+          {
+            id: card.code,
+            name: card.suit + " " + card.value,
+            image: card.image
+          }
+        ]);
+      } catch (err) {
+        alert(err);
+      }
+    }
 
-    const toggleAutoDraw = () => {
-        setAutoDraw(auto => !auto);
+    if (autoDraw && !timerRef.current) {
+      timerRef.current = setInterval(async () => {
+        await getCard();
+      }, 1000);
+    }
+
+    return () => {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
     };
+  }, [autoDraw, setAutoDraw, deck]);
 
-    const cards = drawn.map(c => (
-        <Card key={c.id} name={c.name} image={c.image} />
-    ));
+  const toggleAutoDraw = () => {
+    setAutoDraw(auto => !auto);
+  };
 
-    return (
-        <div className="Deck">
-            {deck ? ( 
-                <button className="Deck-gimme" onClick={toggleAutoDraw}>
-                {autoDraw ? "STOP" : "KEEP"} DRAWING FOR ME!
-                </button>
-            ) : null}
-            <div className="Deck-cardarea">{cards}</div>
-        </div>
-    );
+  const cards = drawn.map(c => (
+    <Card key={c.id} name={c.name} image={c.image} />
+  ));
+
+  return (
+    <div className="Deck">
+      {deck ? (
+        <button className="Deck-gimme" onClick={toggleAutoDraw}>
+          {autoDraw ? "STOP" : "KEEP"} DRAWING FOR ME!
+        </button>
+      ) : null}
+      <div className="Deck-cardarea">{cards}</div>
+    </div>
+  );
 }
 
 export default Deck;

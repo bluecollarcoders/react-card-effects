@@ -1,11 +1,11 @@
 import React from 'react';
-import Deck from "./Deck";
+import Deck from "./Deck"
 
 function App() {
   return (
-    <div>
-    <Deck />
-    </div>
+      <div>
+        <Deck />
+      </div>
   );
 }
 
